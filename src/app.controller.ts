@@ -11,7 +11,7 @@ export class AppController {
 
   @Get()
   async test() {
-    return('hello world');
+    return('hello world')
   }
 
   @Post('upload')
