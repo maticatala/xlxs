@@ -1,4 +1,4 @@
-import { Controller, Post, UploadedFile, UseInterceptors, Res } from '@nestjs/common';
+import { Controller, Post, UploadedFile, UseInterceptors, Res, Get } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as XLSX from 'xlsx';
 import * as PDFDocument from 'pdfkit';
@@ -8,6 +8,12 @@ import * as path from 'path';
 
 @Controller()
 export class AppController {
+
+  @Get()
+  async test() {
+    return('hello world');
+  }
+
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File, @Res() res: Response) {
