@@ -42,7 +42,7 @@ export class AppController {
 
       // Generar el PDF
       const pdfPath = path.join(__dirname, '..', 'uploads', 'transformed.pdf');
-      const doc = new PDFDocument({ size: [250, 600], margin: 0 }); // Tamaño adecuado para impresora POS-80
+      const doc = new PDFDocument({ size: [204, 10000], margin: 0 }); // Tamaño adecuado para impresora POS-80
       const writeStream = fs.createWriteStream(pdfPath);
       doc.pipe(writeStream);
 
@@ -55,10 +55,10 @@ export class AppController {
       };
 
       // Posiciones iniciales
-      let xPos = 10;
+      let xPos = 0;
       let yPos = 10;
       const rowHeight = 15;
-      const colWidths = [90, 50, 50]; // Anchos de las columnas
+      const colWidths = [94, 55, 55]; // Anchos de las columnas
 
       // Establecer el estilo de fuente monoespaciada para impresión en impresora POS
       doc.font('Courier');
@@ -68,11 +68,11 @@ export class AppController {
         for (let i = 0; i < filteredData.length; i++) {
           if (yPos + rowHeight > doc.page.height - 10) {
             // Agregar una nueva página si la fila no cabe en la página actual
-            doc.addPage({ size: [250, 600], margin: 0 });
+            doc.addPage({ size: [204, 10000], margin: 0 });
             yPos = 10; // Reiniciar yPos en la nueva página
           }
 
-          xPos = 10; // Reiniciar la posición x para cada fila
+          xPos = 0; // Reiniciar la posición x para cada fila
 
           for (let j = 0; j < filteredData[i].length; j++) {
             const text = filteredData[i][j] ? filteredData[i][j].toString() : '';
