@@ -58,7 +58,7 @@ export class AppController {
       let xPos = 10;
       let yPos = 10;
       const rowHeight = 15;
-      const colWidths = [110, 60, 60]; // Anchos de las columnas
+      const colWidths = [90, 50, 50]; // Anchos de las columnas
 
       // Establecer el estilo de fuente monoespaciada para impresión en impresora POS
       doc.font('Courier');
