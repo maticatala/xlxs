@@ -42,7 +42,7 @@ export class AppController {
 
       // Generar el PDF
       const pdfPath = path.join(__dirname, '..', 'uploads', 'transformed.pdf');
-      const doc = new PDFDocument({ size: [198, 210], margin: 0 }); // Tamaño adecuado para impresora POS-80
+      const doc = new PDFDocument({ size: [198, 595], margin: 0 }); // Tamaño adecuado para impresora POS-80
       const writeStream = fs.createWriteStream(pdfPath);
       doc.pipe(writeStream);
 
@@ -68,7 +68,7 @@ export class AppController {
         for (let i = 0; i < filteredData.length; i++) {
           if (yPos + rowHeight > doc.page.height - 10) {
             // Agregar una nueva página si la fila no cabe en la página actual
-            doc.addPage({ size: [198, 210], margin: 0 });
+            doc.addPage({ size: [198, 595], margin: 0 });
             yPos = 0; // Reiniciar yPos en la nueva página
           }
 
