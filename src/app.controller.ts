@@ -11,7 +11,7 @@ export class AppController {
 
   @Get()
   async test() {
-    return('hello world')
+    return('hello world');
   }
 
   @Post('upload')
@@ -23,59 +23,56 @@ export class AppController {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
 
-      function calculateTicketHeight(ticketData) {
-        const lineHeight = 15;
-        return (ticketData.length * lineHeight);
-      }
-
       function createPDF(ticketData) {
-        const ticketHeight = calculateTicketHeight(ticketData);
         const pdfPath = path.join(__dirname, '..', 'uploads', 'transformed.pdf');
         const doc = new PDFDocument({
-          size: [198, ticketHeight],
+          size: [198, 841],
           margin: 0
         });
         const writeStream = fs.createWriteStream(pdfPath);
         doc.pipe(writeStream);
 
-        doc.pipe(fs.createWriteStream('ticket.pdf'));
         doc.font('Courier-Bold');
         doc.fontSize(9); // Tamaño de fuente reducido para impresora POS
 
         const drawBorders = (x, y, width, height) => {
           doc.rect(x, y, width, height).stroke();
-        };  
+        };
 
-        const addDataToPDF = () => {
+        const addDataToPDF = (ticketData) => {
           const rowHeight = 15;
           const colWidths = [98, 50, 50]; // Anchos de las columnas
+          const pageHeight = 841;
           let xPos = 0;
           let yPos = 0;
-          for (let i = 0; i < filteredData.length; i++) {
+          for (let i = 0; i < ticketData.length; i++) {
+            if (yPos + rowHeight > pageHeight) {
+              doc.addPage({ size: [198, pageHeight], margin: 0 }); // Crear nueva página
+              yPos = 0; // Reiniciar la posición y para la nueva página
+            }
+
             xPos = 0; // Reiniciar la posición x para cada fila
-  
-            for (let j = 0; j < filteredData[i].length; j++) {
-              const text = filteredData[i][j] ? filteredData[i][j].toString() : '';
+            for (let j = 0; j < ticketData[i].length; j++) {
+              const text = ticketData[i][j] ? ticketData[i][j].toString() : '';
               const options = {
                 width: colWidths[j] - 10,
                 align: j === 1 && i >= 1 ? 'center' : 'left', // Centrar los datos de la columna A2 desde la fila 2
               };
-  
+
               doc.text(text, xPos + 5, yPos + 5, options);
               drawBorders(xPos, yPos, colWidths[j], rowHeight);
-  
+
               xPos += colWidths[j]; // Mover la posición x para la siguiente columna
             }
-  
+
             yPos += rowHeight; // Mover la posición y para la siguiente fila
           }
         };
-  
-        addDataToPDF();
+
+        addDataToPDF(ticketData);
 
         // Terminar el documento
         doc.end();
-
 
         writeStream.on('finish', () => {
           // Enviar el PDF al cliente
@@ -109,7 +106,6 @@ export class AppController {
       filteredData.unshift(['CÓDIGO', 'SISTEMA', 'LOCAL']);
 
       createPDF(filteredData);
-
 
     } catch (error) {
       console.error('Error processing file:', error);
