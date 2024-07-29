@@ -1,4 +1,4 @@
-import { Controller, Post, UploadedFile, UseInterceptors, Res, Get } from '@nestjs/common';
+import { Controller, Post, UploadedFile, UseInterceptors, Res, Get, Body } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as XLSX from 'xlsx';
 import * as PDFDocument from 'pdfkit';
@@ -12,6 +12,71 @@ export class AppController {
   @Get()
   async test() {
     return('hello world');
+  }
+
+  
+  @Post('generate-report')
+  async generateReport(@Body('totalEfectivo') totalEfectivo: number, @Res() res: Response) {
+    try {
+      const pdfPath = path.join(__dirname, '..', 'uploads', 'report.pdf');
+      const doc = new PDFDocument({
+        size: [198, 280],
+        margin: 10
+      });
+
+      const formattedTotalEfectivo = new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS'
+      }).format(totalEfectivo);
+
+      const writeStream = fs.createWriteStream(pdfPath);
+      doc.pipe(writeStream);
+
+      const logoPath = path.join(__dirname, '..', 'assets', 'logo.png');
+      const logoWidth = 150;  // Ancho del logo
+      // const logoHeight = 50; // Alto del logo
+      doc.image(logoPath, (doc.page.width - logoWidth) / 2, 10, { width: logoWidth });
+      
+      doc.font('Helvetica-Bold');
+      
+      // Título
+      doc.moveDown(4);
+      doc.fontSize(12).text('Cierre de caja', { align: 'center'});
+
+      // Datos del reporte
+      doc.moveDown(1);
+      doc.fontSize(10).text(`Fecha: ${new Date().toLocaleString()}`, { align: 'center'});
+      doc.moveDown(2);
+      doc.fontSize(11.5).text('Tot. efectivo:', {continued:true}).text(`${formattedTotalEfectivo} `, { align: 'right'})
+      
+      // Firma y aclaración
+      doc.moveDown(2);
+
+      doc.font('Helvetica').fontSize(11);
+      doc.text('.......................................................', { align: 'center'});
+      doc.text('Firma:', {align: 'center'});
+      doc.moveDown(2);
+      doc.text('.......................................................', { align: 'center'});
+      doc.text('Aclaración:', { align: 'center'});
+
+      // Terminar el documento
+      doc.end();
+
+      writeStream.on('finish', () => {
+        res.sendFile(pdfPath, err => {
+          if (err) {
+            console.error('Error sending PDF:', err);
+            res.status(500).send('Error generating PDF');
+          } else {
+            fs.unlinkSync(pdfPath); // Eliminar el archivo PDF después de enviarlo
+          }
+        });
+      });
+
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      res.status(500).send('Error generating PDF');
+    }
   }
 
   @Post('upload')
