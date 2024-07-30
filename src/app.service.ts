@@ -11,7 +11,7 @@ export class AppService {
   generateReport(totalEfectivo: number, res: Response) {
     const pdfPath = path.join(__dirname, '..', 'uploads', 'report.pdf');
     const doc = new PDFDocument({
-      size: [198, 280],
+      size: [198, 350],
       margin: 10
     });
 
@@ -25,7 +25,7 @@ export class AppService {
 
     const logoPath = path.join(__dirname, '..', 'assets', 'logo.png');
     const logoWidth = 150;  
-    doc.image(logoPath, (doc.page.width - logoWidth) / 2, 10, { width: logoWidth });
+    doc.image(logoPath, (doc.page.width - logoWidth) / 2, 0, { width: logoWidth });
     
     doc.font('Helvetica-Bold');
     
@@ -42,16 +42,17 @@ export class AppService {
       second: '2-digit',
       hour12: false
 })}`, { align: 'center'});
-    doc.moveDown(2);
+    doc.moveDown(4);
     doc.fontSize(11.5).text('Tot. efectivo:', {continued:true}).text(`${formattedTotalEfectivo} `, { align: 'right'})
     
-    doc.moveDown(2);
+    doc.moveDown(4);
     doc.font('Helvetica').fontSize(11);
     doc.text('.......................................................', { align: 'center'});
     doc.text('Firma:', {align: 'center'});
-    doc.moveDown(2);
+    doc.moveDown(3);
     doc.text('.......................................................', { align: 'center'});
     doc.text('Aclaración:', { align: 'center'});
+    doc.moveDown(2);
     doc.end();
 
     writeStream.on('finish', () => {
