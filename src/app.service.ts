@@ -33,7 +33,15 @@ export class AppService {
     doc.fontSize(12).text('Cierre de caja', { align: 'center'});
 
     doc.moveDown(1);
-    doc.fontSize(10).text(`Fecha: ${new Date().toLocaleString('es-AR', {
+    
+    // Crear un objeto Date con la hora actual
+    const now = new Date();
+    
+    // Restar 3 horas (3 * 60 * 60 * 1000 milisegundos)
+    now.setHours(now.getHours() - 3);
+    
+    // Formatear la fecha ajustada
+    const formattedDate = now.toLocaleString('es-AR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -41,7 +49,9 @@ export class AppService {
       minute: '2-digit',
       second: '2-digit',
       hour12: false
-})}`, { align: 'center'});
+    });
+
+    doc.fontSize(10).text(`Fecha: ${formattedDate}`, { align: 'center'});
     doc.moveDown(4);
     doc.fontSize(11.5).text('Tot. efectivo:', {continued:true}).text(`${formattedTotalEfectivo} `, { align: 'right'})
     
