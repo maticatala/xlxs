@@ -33,7 +33,11 @@ export class AppService {
     doc.fontSize(12).text('Cierre de caja', { align: 'center'});
 
     doc.moveDown(1);
-    doc.fontSize(10).text(`Fecha: ${new Date().toLocaleString()}`, { align: 'center'});
+    doc.fontSize(10).text(`Fecha: ${new Date().toLocaleString('es-AR', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric'
+})}`, { align: 'center'});
     doc.moveDown(2);
     doc.fontSize(11.5).text('Tot. efectivo:', {continued:true}).text(`${formattedTotalEfectivo} `, { align: 'right'})
     
