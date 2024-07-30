@@ -34,9 +34,13 @@ export class AppService {
 
     doc.moveDown(1);
     doc.fontSize(10).text(`Fecha: ${new Date().toLocaleString('es-AR', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric'
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
 })}`, { align: 'center'});
     doc.moveDown(2);
     doc.fontSize(11.5).text('Tot. efectivo:', {continued:true}).text(`${formattedTotalEfectivo} `, { align: 'right'})
