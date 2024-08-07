@@ -8,28 +8,29 @@ import { Response } from 'express';
 @Injectable()
 export class AppService {
 
-  generateReport(totalEfectivo: number, res: Response) {
+  generateReport(body: any, res: Response) {
+    const { totalEfectivo, salidas } = body;
     const pdfPath = path.join(__dirname, '..', 'uploads', 'report.pdf');
     const doc = new PDFDocument({
-      size: [198, 350],
+      size: [198, 841],
       margin: 10
     });
+    const writeStream = fs.createWriteStream(pdfPath);
+    doc.pipe(writeStream);
 
     const formattedTotalEfectivo = new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS'
     }).format(totalEfectivo);
 
-    const writeStream = fs.createWriteStream(pdfPath);
-    doc.pipe(writeStream);
 
     const logoPath = path.join(__dirname, '..', 'assets', 'logo.png');
     const logoWidth = 150;  
-    doc.image(logoPath, (doc.page.width - logoWidth) / 2, 0, { width: logoWidth });
+    doc.image(logoPath, (doc.page.width - logoWidth) / 2, -15, { width: logoWidth });
     
     doc.font('Helvetica-Bold');
     
-    doc.moveDown(4);
+    doc.moveDown(3);
     doc.fontSize(12).text('Cierre de caja', { align: 'center'});
 
     doc.moveDown(1);
@@ -52,9 +53,47 @@ export class AppService {
     });
 
     doc.fontSize(10).text(`Fecha: ${formattedDate}`, { align: 'center'});
-    doc.moveDown(4);
-    doc.fontSize(11.5).text('Tot. efectivo:', {continued:true}).text(`${formattedTotalEfectivo} `, { align: 'right'})
-    
+
+    if (salidas && salidas.length > 0) {
+      let totalSalidas = 0;
+      salidas.forEach(salida => {
+        totalSalidas += salida.monto;
+      });
+
+      const totalFinal = totalEfectivo + totalSalidas;
+      const formattedTotalFinal = new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS'
+      }).format(totalFinal);
+
+      doc.moveDown(4);
+      doc.fontSize(11.5).text('Total Efectivo:', {continued: true}).text(`${formattedTotalFinal} `, { align: 'right'});
+
+
+      doc.moveDown(0.5);
+      doc.fontSize(10.5).text('Salidas:');
+      salidas.forEach(salida => {
+        doc.moveDown(1);
+        const formattedMonto = new Intl.NumberFormat('es-AR', {
+          style: 'currency',
+          currency: 'ARS'
+        }).format(-salida.monto);
+        
+        doc.font('Helvetica');
+        doc.fontSize(10.5).text(`${salida.descripcion})`, {continued: true});
+        doc.font('Helvetica-Bold');
+        doc.fontSize(11.5).text(`${formattedMonto}`, { align: 'right'});
+      });
+      // doc.text('----------------------------------------------', { align: 'center'});
+      doc.moveDown(1);
+      doc.moveTo(10, doc.y).lineTo(188, doc.y).stroke();
+      doc.moveDown(1);
+    }
+
+    if (!salidas) doc.moveDown(4);
+
+    doc.fontSize(11.5).text('Total Final:', {continued:true}).text(`${formattedTotalEfectivo} `, { align: 'right'});
+
     doc.moveDown(4);
     doc.font('Helvetica').fontSize(11);
     doc.text('.......................................................', { align: 'center'});
