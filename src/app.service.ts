@@ -89,7 +89,7 @@ export class AppService {
       doc.moveDown(1);
     }
 
-    if (!salidas) doc.moveDown(4);
+    if (salidas.length === 0) doc.moveDown(4);
 
     doc.fontSize(11.5).text('Total Final:', {continued:true}).text(`${formattedTotalEfectivo} `, { align: 'right'});
 
