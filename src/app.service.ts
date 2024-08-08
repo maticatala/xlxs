@@ -80,11 +80,10 @@ export class AppService {
         }).format(-salida.monto);
         
         doc.font('Helvetica');
-        doc.fontSize(10.5).text(`${salida.descripcion})`, {continued: true});
+        doc.fontSize(10.5).text(`(${salida.descripcion})`, {continued: true});
         doc.font('Helvetica-Bold');
         doc.fontSize(11.5).text(`${formattedMonto}`, { align: 'right'});
       });
-      // doc.text('----------------------------------------------', { align: 'center'});
       doc.moveDown(1);
       doc.moveTo(10, doc.y).lineTo(188, doc.y).stroke();
       doc.moveDown(1);
